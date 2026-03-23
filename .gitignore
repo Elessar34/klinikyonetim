@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+AGENTS.md
+CLAUDE.md
 
 # next.js
 /.next/
@@ -30,12 +32,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
-
-# vercel
-.vercel
+!.env.example
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma

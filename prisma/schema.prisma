@@ -1,0 +1,653 @@
+// PetVet ERP/CRM — Kapsamlı Veritabanı Şeması
+// Multi-tenant, rol tabanlı, veteriner/pet shop/pet kuaför
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================
+// ENUMS
+// =============================================
+
+enum BusinessType {
+  VETERINER
+  PET_KUAFOR
+}
+
+enum UserRole {
+  SUPER_ADMIN  // Platform yöneticisi
+  OWNER        // İşletme sahibi
+  ADMIN        // İşletme admin
+  MANAGER      // Şube müdürü
+  STAFF        // Personel
+  RECEPTIONIST // Resepsiyonist
+  CUSTOMER     // Müşteri (portal erişimi)
+}
+
+enum SubscriptionPlan {
+  TRIAL
+  BASLANGIC
+  PROFESYONEL
+  ISLETME
+  KURUMSAL
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum AppointmentStatus {
+  PENDING          // Beklemede
+  CONFIRMED        // Teyit edildi
+  IN_PROGRESS      // Devam ediyor
+  COMPLETED        // Tamamlandı
+  CANCELED         // İptal edildi
+  NO_SHOW          // Gelmedi
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+// =============================================
+// CORE: TENANT & AUTH
+// =============================================
+
+model Tenant {
+  id                String             @id @default(cuid())
+  name              String             // İşletme adı
+  slug              String             @unique // URL-friendly isim (subdomain)
+  businessType      BusinessType
+  phone             String?
+  email             String?
+  address           String?
+  city              String?
+  district          String?
+  postalCode        String?
+  taxNumber         String?            // Vergi numarası
+  taxOffice         String?            // Vergi dairesi
+  logoUrl           String?
+  website           String?
+  description       String?
+  workingHours      Json?              // {"mon": {"open": "09:00", "close": "19:00"}, ...}
+  isActive          Boolean            @default(true)
+
+  // Subscription
+  subscriptionPlan   SubscriptionPlan  @default(TRIAL)
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  trialEndsAt        DateTime?
+  subscriptionEndsAt DateTime?
+
+  // Relations
+  users             User[]
+  customers         Customer[]
+  pets              Pet[]
+  appointments      Appointment[]
+  services          Service[]
+  products          Product[]
+  transactions      Transaction[]
+  invoices          Invoice[]
+  staff             Staff[]
+  medicalRecords    MedicalRecord[]
+  vaccinations      Vaccination[]
+  prescriptions     Prescription[]
+  labResults        LabResult[]
+  groomingRecords   GroomingRecord[]
+  suppliers         Supplier[]
+  auditLogs         AuditLog[]
+  notifications     Notification[]
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([slug])
+  @@index([businessType])
+}
+
+model User {
+  id               String     @id @default(cuid())
+  email            String     @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  phone            String?
+  avatarUrl        String?
+  role             UserRole   @default(STAFF)
+  isActive         Boolean    @default(true)
+  emailVerified    DateTime?
+  lastLoginAt      DateTime?
+  lastLoginIp      String?
+  twoFactorEnabled Boolean    @default(false)
+  twoFactorSecret  String?
+
+  // Tenant relation
+  tenantId         String
+  tenant           Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  sessions         Session[]
+  appointments     Appointment[] @relation("AppointmentUser")
+  createdAppointments Appointment[] @relation("AppointmentCreator")
+  auditLogs        AuditLog[]
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@unique([email, tenantId])
+  @@index([tenantId])
+  @@index([email])
+  @@index([role])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+  ipAddress    String?
+  userAgent    String?
+
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// =============================================
+// CRM: CUSTOMERS & PETS
+// =============================================
+
+model Customer {
+  id              String          @id @default(cuid())
+  firstName       String
+  lastName        String
+  phone           String
+  phoneSecondary  String?
+  email           String?
+  address         String?
+  city            String?
+  district        String?
+  notes           String?
+  isActive        Boolean         @default(true)
+
+  // Portal access
+  portalPassword  String?         // Müşteri portal şifresi (hashed)
+  portalEnabled   Boolean         @default(false)
+  customerNo      String?         // Müşteri no (portal girişi için)
+
+  // Loyalty
+  loyaltyPoints   Int             @default(0)
+  totalSpent      Float           @default(0)
+
+  // Tenant
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  pets            Pet[]
+  appointments    Appointment[]
+  transactions    Transaction[]
+  invoices        Invoice[]
+  notifications   Notification[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([tenantId])
+  @@index([phone])
+  @@index([customerNo, tenantId])
+}
+
+model Pet {
+  id              String          @id @default(cuid())
+  name            String
+  species         String          // Köpek, Kedi, Kuş, Tavşan vb.
+  breed           String?         // Irk
+  gender          Gender          @default(UNKNOWN)
+  dateOfBirth     DateTime?
+  weight          Float?          // kg
+  color           String?
+  microchipNo     String?         // Çip numarası
+  photoUrl        String?
+  notes           String?
+  isAlive         Boolean         @default(true)
+  allergies       String?         // Alerjiler
+  bloodType       String?
+
+  // QR Code
+  qrCode          String?         @unique
+
+  // Grooming specific
+  coatType        String?         // Tüy tipi: kısa, uzun, kıvırcık vb.
+  skinSensitivity String?         // Cilt hassasiyeti
+  groomingCycleDays Int?          // Bakım döngüsü (gün)
+  lastGroomingDate DateTime?
+
+  // Relations
+  customerId      String
+  customer        Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  appointments    Appointment[]
+  medicalRecords  MedicalRecord[]
+  vaccinations    Vaccination[]
+  prescriptions   Prescription[]
+  labResults      LabResult[]
+  groomingRecords GroomingRecord[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([tenantId])
+  @@index([customerId])
+  @@index([species])
+  @@index([qrCode])
+}
+
+// =============================================
+// APPOINTMENTS
+// =============================================
+
+model Service {
+  id              String          @id @default(cuid())
+  name            String
+  description     String?
+  duration        Int             // Dakika
+  price           Float
+  category        String?         // Muayene, Aşı, Tıraş, Yıkama vb.
+  isActive        Boolean         @default(true)
+  applicableTo    BusinessType[]  // Hangi iş tiplerinde geçerli
+
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  appointments    Appointment[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([tenantId])
+  @@index([category])
+}
+
+model Appointment {
+  id              String            @id @default(cuid())
+  date            DateTime
+  endDate         DateTime?
+  status          AppointmentStatus @default(PENDING)
+  notes           String?
+  cancelReason    String?
+  reminderSent    Boolean           @default(false)
+  confirmationSent Boolean          @default(false)
+  confirmedAt     DateTime?
+
+  // Relations
+  serviceId       String?
+  service         Service?          @relation(fields: [serviceId], references: [id])
+  customerId      String
+  customer        Customer          @relation(fields: [customerId], references: [id])
+  petId           String
+  pet             Pet               @relation(fields: [petId], references: [id])
+  assignedToId    String?
+  assignedTo      User?             @relation("AppointmentUser", fields: [assignedToId], references: [id])
+  createdById     String?
+  createdBy       User?             @relation("AppointmentCreator", fields: [createdById], references: [id])
+  tenantId        String
+  tenant          Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  transaction     Transaction?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([tenantId])
+  @@index([date])
+  @@index([status])
+  @@index([customerId])
+  @@index([assignedToId])
+}
+
+// =============================================
+// FINANCE: TRANSACTIONS & INVOICES
+// =============================================
+
+model Transaction {
+  id              String          @id @default(cuid())
+  type            String          // INCOME, EXPENSE
+  category        String          // service, product_sale, salary, rent vb.
+  amount          Float
+  description     String?
+  paymentMethod   String?         // cash, card, transfer
+  paymentStatus   PaymentStatus   @default(PENDING)
+  paymentDate     DateTime?
+
+  // Relations
+  appointmentId   String?         @unique
+  appointment     Appointment?    @relation(fields: [appointmentId], references: [id])
+  customerId      String?
+  customer        Customer?       @relation(fields: [customerId], references: [id])
+  invoiceId       String?
+  invoice         Invoice?        @relation(fields: [invoiceId], references: [id])
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([paymentDate])
+}
+
+model Invoice {
+  id              String          @id @default(cuid())
+  invoiceNo       String
+  issueDate       DateTime        @default(now())
+  dueDate         DateTime?
+  totalAmount     Float
+  taxAmount       Float           @default(0)
+  status          String          @default("draft") // draft, sent, paid, canceled
+  pdfUrl          String?
+
+  customerId      String
+  customer        Customer        @relation(fields: [customerId], references: [id])
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  transactions    Transaction[]
+  items           InvoiceItem[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([invoiceNo, tenantId])
+  @@index([tenantId])
+}
+
+model InvoiceItem {
+  id              String          @id @default(cuid())
+  description     String
+  quantity        Int             @default(1)
+  unitPrice       Float
+  totalPrice      Float
+  taxRate         Float           @default(0)
+
+  invoiceId       String
+  invoice         Invoice         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+}
+
+// =============================================
+// STAFF
+// =============================================
+
+model Staff {
+  id              String          @id @default(cuid())
+  firstName       String
+  lastName        String
+  phone           String?
+  email           String?
+  role            String          // veteriner, kuafor, kasiyer, depocu vb.
+  salary          Float?
+  startDate       DateTime?
+  isActive        Boolean         @default(true)
+  workingHours    Json?           // Çalışma saatleri
+  specializations String[]        // Uzmanlık alanları
+
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([tenantId])
+}
+
+// =============================================
+// VETERINER-SPECIFIC: MEDICAL
+// =============================================
+
+model MedicalRecord {
+  id              String          @id @default(cuid())
+  visitDate       DateTime        @default(now())
+  chiefComplaint  String?         // Başvuru şikayeti
+  diagnosis       String?         // Teşhis
+  treatment       String?         // Tedavi
+  notes           String?         // SOAP notları
+  weight          Float?          // Muayene anındaki ağırlık
+  temperature     Float?          // Vücut sıcaklığı
+  heartRate       Int?            // Kalp atış hızı
+  respiratoryRate Int?            // Solunum hızı
+  followUpDate    DateTime?       // Kontrol tarihi
+
+  petId           String
+  pet             Pet             @relation(fields: [petId], references: [id], onDelete: Cascade)
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([tenantId])
+  @@index([petId])
+  @@index([visitDate])
+}
+
+model Vaccination {
+  id              String          @id @default(cuid())
+  vaccineName     String
+  vaccineType     String?         // Kuduz, Karma, Leptospirosis vb.
+  batchNumber     String?         // Parti numarası
+  administeredDate DateTime
+  nextDueDate     DateTime?       // Sonraki aşı tarihi
+  reminderSent    Boolean         @default(false)
+  notes           String?
+
+  petId           String
+  pet             Pet             @relation(fields: [petId], references: [id], onDelete: Cascade)
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+
+  @@index([tenantId])
+  @@index([petId])
+  @@index([nextDueDate])
+}
+
+model Prescription {
+  id              String          @id @default(cuid())
+  prescriptionDate DateTime       @default(now())
+  medications     Json            // [{name, dosage, frequency, duration}]
+  notes           String?
+  isActive        Boolean         @default(true)
+
+  petId           String
+  pet             Pet             @relation(fields: [petId], references: [id], onDelete: Cascade)
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+
+  @@index([tenantId])
+  @@index([petId])
+}
+
+model LabResult {
+  id              String          @id @default(cuid())
+  testName        String
+  testDate        DateTime        @default(now())
+  results         Json?           // [{parameter, value, unit, referenceRange}]
+  notes           String?
+  fileUrl         String?         // PDF/görüntü dosya
+  status          String          @default("pending") // pending, completed
+
+  petId           String
+  pet             Pet             @relation(fields: [petId], references: [id], onDelete: Cascade)
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+
+  @@index([tenantId])
+  @@index([petId])
+}
+
+// =============================================
+// PET KUAFÖR-SPECIFIC: GROOMING
+// =============================================
+
+model GroomingRecord {
+  id              String          @id @default(cuid())
+  groomingDate    DateTime        @default(now())
+  servicesPerformed String[]      // Yıkama, tıraş, tırnak vb.
+  notes           String?
+  beforePhotoUrl  String?
+  afterPhotoUrl   String?
+  productsUsed    Json?           // [{product, quantity}]
+  nextSuggestedDate DateTime?     // Önerilen sonraki bakım
+
+  petId           String
+  pet             Pet             @relation(fields: [petId], references: [id], onDelete: Cascade)
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+
+  @@index([tenantId])
+  @@index([petId])
+  @@index([groomingDate])
+}
+
+// =============================================
+// PET SHOP-SPECIFIC: INVENTORY
+// =============================================
+
+model Product {
+  id              String          @id @default(cuid())
+  name            String
+  sku             String?         // Stok kodu
+  barcode         String?
+  category        String?         // Mama, aksesuar, ilaç, oyuncak vb.
+  description     String?
+  price           Float
+  costPrice       Float?          // Alış fiyatı
+  stockQuantity   Int             @default(0)
+  minStockLevel   Int             @default(5) // Minimum stok uyarısı
+  unit            String          @default("adet") // adet, kg, litre
+  expiryDate      DateTime?       // Son kullanma tarihi
+  imageUrl        String?
+  isActive        Boolean         @default(true)
+
+  supplierId      String?
+  supplier        Supplier?       @relation(fields: [supplierId], references: [id])
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([barcode, tenantId])
+  @@unique([sku, tenantId])
+  @@index([tenantId])
+  @@index([category])
+}
+
+model Supplier {
+  id              String          @id @default(cuid())
+  name            String
+  contactPerson   String?
+  phone           String?
+  email           String?
+  address         String?
+  notes           String?
+  isActive        Boolean         @default(true)
+
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  products        Product[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([tenantId])
+}
+
+// =============================================
+// SYSTEM: AUDIT & NOTIFICATIONS
+// =============================================
+
+model AuditLog {
+  id              String          @id @default(cuid())
+  action          String          // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entity          String          // User, Pet, Appointment vb.
+  entityId        String?
+  details         Json?           // Değiştirilen alanlar
+  ipAddress       String?
+  userAgent       String?
+
+  userId          String?
+  user            User?           @relation(fields: [userId], references: [id])
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model Notification {
+  id              String          @id @default(cuid())
+  type            String          // appointment_reminder, vaccination_due, stock_low vb.
+  channel         String          // sms, email, whatsapp, push
+  title           String
+  message         String
+  isRead          Boolean         @default(false)
+  isSent          Boolean         @default(false)
+  sentAt          DateTime?
+  scheduledAt     DateTime?       // Planlanan gönderim zamanı
+  metadata        Json?           // Ek bilgiler
+
+  customerId      String?
+  customer        Customer?       @relation(fields: [customerId], references: [id])
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime        @default(now())
+
+  @@index([tenantId])
+  @@index([scheduledAt])
+  @@index([isSent])
+}
