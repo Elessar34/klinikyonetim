@@ -2,7 +2,7 @@
 // Multi-tenant, rol tabanlı, veteriner/pet shop/pet kuaför
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
