@@ -90,19 +90,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Main domain — panel access redirect to subdomain
-  else if (!subdomain) {
-    if (pathname.startsWith("/panel")) {
-      // In dev mode, allow direct access (no subdomains configured)
-      if (process.env.NODE_ENV !== "production") {
-        // Allow, just continue
-      } else {
-        // Production: redirect to vet subdomain (default)
-        const vetUrl = new URL(pathname, `https://vet.${ROOT_DOMAIN}`);
-        return NextResponse.redirect(vetUrl);
-      }
-    }
-  }
+  // 4. Main domain — no special routing needed
+  // Panel access is allowed on any domain (main, vet, pet)
+  // Users stay on whichever domain they logged in from
 
   // ============ AUTH GUARD ============
   if (pathname.startsWith("/panel")) {
