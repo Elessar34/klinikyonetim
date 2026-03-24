@@ -43,11 +43,46 @@ declare module "next-auth" {
   }
 }
 
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "klinikyonetim.net"
+const isProduction = process.env.NODE_ENV === "production"
+const cookieDomain = isProduction ? `.${ROOT_DOMAIN}` : undefined
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   pages: {
     signIn: "/giris",
     newUser: "/kayit",
+  },
+  cookies: {
+    sessionToken: {
+      name: isProduction ? "__Secure-authjs.session-token" : "authjs.session-token",
+      options: {
+        domain: cookieDomain,
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: isProduction,
+      },
+    },
+    csrfToken: {
+      name: isProduction ? "__Host-authjs.csrf-token" : "authjs.csrf-token",
+      options: {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: isProduction,
+      },
+    },
+    callbackUrl: {
+      name: isProduction ? "__Secure-authjs.callback-url" : "authjs.callback-url",
+      options: {
+        domain: cookieDomain,
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: isProduction,
+      },
+    },
   },
   session: {
     strategy: "jwt",
