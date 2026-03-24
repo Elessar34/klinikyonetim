@@ -64,6 +64,7 @@ const navItems: NavItem[] = [
   { href: "/panel/receteler", label: "Reçeteler", icon: faPrescription, businessTypes: ["VETERINER"], category: "Veteriner" },
   { href: "/panel/laboratuvar", label: "Laboratuvar", icon: faFlask, businessTypes: ["VETERINER"], category: "Veteriner" },
   { href: "/panel/ilac-stok", label: "İlaç & Stok", icon: faPills, businessTypes: ["VETERINER"], category: "Veteriner" },
+  { href: "/panel/ameliyatlar", label: "Ameliyat Kayıtları", icon: faStethoscope, businessTypes: ["VETERINER"], category: "Veteriner" },
 
   // Stok & Satış (ortak)
   { href: "/panel/stok", label: "Stok Yönetimi", icon: faBoxesStacked, category: "Stok & Satış" },
