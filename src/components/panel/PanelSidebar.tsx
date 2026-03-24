@@ -23,6 +23,8 @@ import {
   faBell,
   faChartLine,
   faGear,
+  faBoxesStacked,
+  faCashRegister,
   faClockRotateLeft,
   faChevronLeft,
   faChevronRight,
@@ -63,6 +65,9 @@ const navItems: NavItem[] = [
   { href: "/panel/laboratuvar", label: "Laboratuvar", icon: faFlask, businessTypes: ["VETERINER"], category: "Veteriner" },
   { href: "/panel/ilac-stok", label: "İlaç & Stok", icon: faPills, businessTypes: ["VETERINER"], category: "Veteriner" },
 
+  // Stok & Satış (ortak)
+  { href: "/panel/stok", label: "Stok Yönetimi", icon: faBoxesStacked, category: "Stok & Satış" },
+  { href: "/panel/satis", label: "Satış Kasa", icon: faCashRegister, category: "Stok & Satış" },
 
 
   // Hizmetler (tüm iş tipleri)
