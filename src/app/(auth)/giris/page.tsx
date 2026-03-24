@@ -35,6 +35,25 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error);
       } else {
+        // Fetch session to get business type for correct subdomain redirect
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        const bizType = session?.user?.businessType;
+        const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "klinikyonetim.net";
+        const isLocalhost = window.location.hostname.includes("localhost");
+
+        // If on main domain in production, redirect to correct subdomain
+        if (!isLocalhost && bizType) {
+          const subPrefix = bizType === "PET_KUAFOR" ? "pet" : "vet";
+          const currentHost = window.location.hostname;
+          const expectedHost = `${subPrefix}.${rootDomain}`;
+
+          if (currentHost !== expectedHost) {
+            window.location.href = `https://${expectedHost}/panel/dashboard`;
+            return;
+          }
+        }
+
         router.push("/panel/dashboard");
         router.refresh();
       }
