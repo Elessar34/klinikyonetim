@@ -163,6 +163,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create INCOME transaction for accounting/dashboard
+    const itemNames = sale.items.map((i) => i.product.name).join(", ");
+    await prisma.transaction.create({
+      data: {
+        type: "INCOME",
+        amount: netAmount,
+        category: "Ürün Satışı",
+        description: `${saleNumber} — ${itemNames}`,
+        paymentMethod: data.paymentMethod === "NAKIT" ? "CASH" : data.paymentMethod === "KART" ? "CREDIT_CARD" : "BANK_TRANSFER",
+        tenantId: session.user.tenantId,
+      },
+    });
+
     // Check low stock after sale
     for (const item of data.items) {
       const product = await prisma.product.findUnique({ where: { id: item.productId } });

@@ -171,7 +171,7 @@ export default function StockClient() {
       </div>
 
       {/* Barcode Scanner */}
-      <div className="bg-gradient-to-r from-[var(--kp-primary)] to-emerald-600 rounded-xl p-4 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg">
         <div className="flex items-center gap-3">
           <FontAwesomeIcon icon={faBarcode} className="text-2xl" />
           <div className="flex-1">

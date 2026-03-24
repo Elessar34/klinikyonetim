@@ -78,7 +78,7 @@ export default function DashboardClient({ greeting, firstName, tenantName, busin
     { label: "Toplam Müşteri", value: data?.stats.totalCustomers ?? "—", icon: faUsers, color: "bg-kp-green/10 text-kp-green" },
     { label: "Kayıtlı Pet", value: data?.stats.totalPets ?? "—", icon: faDog, color: "bg-kp-orange/10 text-kp-orange" },
     { label: "Bugün Randevu", value: data?.stats.todayAppointmentCount ?? "—", icon: faCalendarDays, color: "bg-blue-50 text-blue-600" },
-    { label: "Aylık Kâr", value: data ? fmt(data.stats.monthlyProfit) : "—", icon: faArrowTrendUp, color: "bg-emerald-50 text-emerald-600" },
+    { label: "Aylık Kazanç", value: data ? fmt(data.stats.monthlyProfit) : "—", icon: faArrowTrendUp, color: "bg-emerald-50 text-emerald-600" },
   ];
 
   const quickActions = [

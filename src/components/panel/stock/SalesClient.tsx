@@ -258,7 +258,7 @@ export default function SalesClient() {
             {/* Payment Method */}
             <div>
               <Label className="text-sm">Ödeme Yöntemi</Label>
-              <div className="grid grid-cols-3 gap-2 mt-1">
+              <div className="flex gap-2 mt-1">
                 {([
                   { key: "NAKIT", icon: faMoneyBill, label: "Nakit" },
                   { key: "KART", icon: faCreditCard, label: "Kart" },
@@ -267,13 +267,13 @@ export default function SalesClient() {
                   <button
                     key={m.key}
                     onClick={() => setPaymentMethod(m.key)}
-                    className={`p-3 rounded-lg border text-center text-sm transition ${
+                    className={`flex-1 p-3 rounded-lg border text-center text-sm font-medium transition ${
                       paymentMethod === m.key
-                        ? "bg-[var(--kp-primary)] text-white border-[var(--kp-primary)]"
-                        : "bg-white hover:bg-gray-50"
+                        ? "bg-[var(--kp-primary)] text-white border-[var(--kp-primary)] shadow-md"
+                        : "bg-white hover:bg-gray-50 border-gray-200"
                     }`}
                   >
-                    <FontAwesomeIcon icon={m.icon} className="block text-xl mx-auto mb-1" />
+                    <FontAwesomeIcon icon={m.icon} className="block text-lg mx-auto mb-1" />
                     {m.label}
                   </button>
                 ))}
@@ -341,7 +341,7 @@ export default function SalesClient() {
                     </div>
                     <div className="text-right">
                       <div className="font-bold">₺{s.netAmount.toLocaleString("tr-TR")}</div>
-                      <Badge variant="outline" className="text-xs">{s.paymentMethod}</Badge>
+                      <Badge variant="outline" className="text-xs">{s.paymentMethod === "NAKIT" ? "💵 Nakit" : s.paymentMethod === "KART" ? "💳 Kart" : "🏦 Havale"}</Badge>
                     </div>
                   </div>
                 ))}
