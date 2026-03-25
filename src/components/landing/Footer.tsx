@@ -6,31 +6,37 @@ import { faPaw, faEnvelope, faPhone, faLocationDot } from "@fortawesome/free-sol
 import { faWhatsapp, faInstagram, faFacebook, faTwitter } from "@fortawesome/free-brands-svg-icons";
 
 const footerLinks = {
-  urun: {
-    title: "Ürün",
+  veteriner: {
+    title: "🩺 Veteriner",
     links: [
-      { label: "Özellikler", href: "#ozellikler" },
-      { label: "Fiyatlandırma", href: "#fiyatlandirma" },
-      { label: "Veteriner Modülleri", href: "/ozellikler/veteriner" },
-      { label: "Pet Kuaför Modülleri", href: "/ozellikler/pet-kuafor" },
+      { label: "Tüm Veteriner Özellikleri", href: "/veteriner" },
+      { label: "Hasta Dosyası (EMR)", href: "/veteriner/ozellikler/hasta-dosyasi" },
+      { label: "Aşı Takibi", href: "/veteriner/ozellikler/asi-takibi" },
+      { label: "Reçete Yönetimi", href: "/veteriner/ozellikler/recete-yonetimi" },
+      { label: "Laboratuvar", href: "/veteriner/ozellikler/laboratuvar" },
+      { label: "Ameliyat Kayıtları", href: "/veteriner/ozellikler/ameliyat-kayitlari" },
+      { label: "İlaç & Stok", href: "/veteriner/ozellikler/ilac-stok" },
+    ],
+  },
+  petKuafor: {
+    title: "✂️ Pet Kuaför",
+    links: [
+      { label: "Tüm Pet Kuaför Özellikleri", href: "/pet-kuafor" },
+      { label: "Bakım Hizmetleri", href: "/pet-kuafor/ozellikler/bakim-hizmetleri" },
+      { label: "Bakım Geçmişi", href: "/pet-kuafor/ozellikler/bakim-gecmisi" },
+      { label: "Öncesi/Sonrası Fotoğraf", href: "/pet-kuafor/ozellikler/galeri" },
+      { label: "Kuaför Takvimi", href: "/pet-kuafor/ozellikler/kuafor-takvimi" },
+      { label: "Mobil Kuaför Rota", href: "/pet-kuafor/ozellikler/mobil-kuafor" },
+      { label: "Ürün & Stok Takibi", href: "/pet-kuafor/ozellikler/stok-yonetimi" },
     ],
   },
   sirket: {
     title: "Şirket",
     links: [
       { label: "Hakkımızda", href: "/hakkimizda" },
+      { label: "İletişim", href: "/iletisim" },
       { label: "Blog", href: "/blog" },
-      { label: "Referanslar", href: "/referanslar" },
-      { label: "İletişim", href: "#iletisim" },
-    ],
-  },
-  destek: {
-    title: "Destek",
-    links: [
-      { label: "SSS", href: "#sss" },
-      { label: "Yardım Merkezi", href: "/yardim" },
-      { label: "API Dokümantasyonu", href: "/api-docs" },
-      { label: "Durum Sayfası", href: "/durum" },
+      { label: "Fiyatlandırma", href: "/fiyatlandirma" },
     ],
   },
   yasal: {
@@ -39,7 +45,6 @@ const footerLinks = {
       { label: "Gizlilik Politikası", href: "/gizlilik-politikasi" },
       { label: "Kullanım Şartları", href: "/kullanim-sartlari" },
       { label: "KVKK Aydınlatma", href: "/kvkk" },
-      { label: "Çerez Politikası", href: "/cerez-politikasi" },
     ],
   },
 };
@@ -53,7 +58,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer id="iletisim" className="bg-kp-navy text-white/80">
+    <footer className="bg-kp-navy text-white/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="grid lg:grid-cols-5 gap-12 py-16">
@@ -83,7 +88,7 @@ export default function Footer() {
               </a>
               <div className="flex items-center gap-2 text-white/50">
                 <FontAwesomeIcon icon={faLocationDot} className="w-4 text-xs" />
-                <span>İstanbul, Türkiye</span>
+                <span>Lefkoşa, KKTC</span>
               </div>
             </div>
           </div>
