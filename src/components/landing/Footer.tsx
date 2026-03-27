@@ -7,7 +7,7 @@ import { faWhatsapp, faInstagram, faFacebook, faTwitter } from "@fortawesome/fre
 
 const footerLinks = {
   veteriner: {
-    title: "🩺 Veteriner",
+    title: "Veteriner",
     links: [
       { label: "Tüm Veteriner Özellikleri", href: "/veteriner" },
       { label: "Hasta Dosyası (EMR)", href: "/veteriner/ozellikler/hasta-dosyasi" },
@@ -19,7 +19,7 @@ const footerLinks = {
     ],
   },
   petKuafor: {
-    title: "✂️ Pet Kuaför",
+    title: "Pet Kuaför",
     links: [
       { label: "Tüm Pet Kuaför Özellikleri", href: "/pet-kuafor" },
       { label: "Bakım Hizmetleri", href: "/pet-kuafor/ozellikler/bakim-hizmetleri" },
@@ -58,7 +58,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-kp-navy text-white/80">
+    <footer className="bg-gradient-to-br from-[#2D9F6F] via-[#238c5f] to-emerald-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="grid lg:grid-cols-5 gap-12 py-16">
@@ -72,23 +72,23 @@ export default function Footer() {
                 Klinik Yönetim
               </span>
             </Link>
-            <p className="text-sm text-white/50 mb-6 leading-relaxed">
+            <p className="text-sm text-white/70 mb-6 leading-relaxed">
               Veteriner klinikleri ve pet kuaförleri için hepsi bir arada yönetim platformu.
             </p>
 
             {/* Contact Info */}
             <div className="space-y-3 text-sm">
-              <a href="mailto:info@klinikyonetim.net" className="flex items-center gap-2 text-white/50 hover:text-kp-green transition-colors">
+              <a href="mailto:info@klinikyonetim.net" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
                 <FontAwesomeIcon icon={faEnvelope} className="w-4 text-xs" />
                 info@klinikyonetim.net
               </a>
-              <a href="tel:+905001234567" className="flex items-center gap-2 text-white/50 hover:text-kp-green transition-colors">
+              <a href="tel:+905001234567" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
                 <FontAwesomeIcon icon={faPhone} className="w-4 text-xs" />
                 +90 500 123 45 67
               </a>
-              <div className="flex items-center gap-2 text-white/50">
+              <div className="flex items-center gap-2 text-white/70">
                 <FontAwesomeIcon icon={faLocationDot} className="w-4 text-xs" />
-                <span>Lefkoşa, KKTC</span>
+                <span>Türkiye</span>
               </div>
             </div>
           </div>
@@ -102,7 +102,7 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-white/50 hover:text-kp-green transition-colors"
+                      className="text-sm text-white/70 hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -114,8 +114,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-white/40">
+        <div className="border-t border-white/20 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-white/60">
             &copy; {new Date().getFullYear()} Klinik Yönetim. Tüm hakları saklıdır.
           </p>
           <div className="flex items-center gap-4">
@@ -123,7 +123,7 @@ export default function Footer() {
               <a
                 key={social.label}
                 href={social.href}
-                className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center hover:bg-kp-green/20 hover:text-kp-green transition-all"
+                className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
                 aria-label={social.label}
                 target="_blank"
                 rel="noopener noreferrer"

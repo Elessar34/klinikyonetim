@@ -6,47 +6,49 @@ import {
   faGear,
   faRocket,
 } from "@fortawesome/free-solid-svg-icons";
-import { Badge } from "@/components/ui/badge";
 
 const steps = [
   {
-    number: "01",
+    number: "1",
     icon: faUserPlus,
     title: "Kayıt Olun",
-    description: "İş tipinizi (veteriner veya pet kuaför) seçin ve 2 dakikada hesabınızı oluşturun. Kredi kartı gerekmez.",
+    description: "İş tipinizi seçin ve 2 dakikada hesabınızı oluşturun. Kredi kartı gerekmez.",
     iconColor: "text-kp-green",
-    badgeBg: "bg-kp-green",
+    numberBg: "bg-kp-green",
     bgColor: "bg-emerald-50",
+    borderColor: "border-emerald-200/50",
   },
   {
-    number: "02",
+    number: "2",
     icon: faGear,
     title: "İşletmenizi Kurun",
-    description: "Personel, hizmetler ve çalışma saatlerinizi tanımlayın. Müşteri ve pet verilerinizi kolayca aktarın.",
+    description: "Personel, hizmetler ve çalışma saatlerinizi tanımlayın. Müşteri verilerinizi kolayca aktarın.",
     iconColor: "text-kp-orange",
-    badgeBg: "bg-kp-orange",
+    numberBg: "bg-kp-orange",
     bgColor: "bg-amber-50",
+    borderColor: "border-amber-200/50",
   },
   {
-    number: "03",
+    number: "3",
     icon: faRocket,
     title: "Yönetmeye Başlayın",
-    description: "Randevu alın, hizmet verin, faturalandırın. Tüm iş süreçleriniz artık dijitalde ve kontrolünüzde.",
+    description: "Randevu alın, hizmet verin, faturalandırın. Tüm iş süreçleriniz artık dijitalde.",
     iconColor: "text-kp-coral",
-    badgeBg: "bg-kp-coral",
+    numberBg: "bg-kp-coral",
     bgColor: "bg-rose-50",
+    borderColor: "border-rose-200/50",
   },
 ];
 
 export default function HowItWorksSection() {
   return (
     <section id="nasil-calisir" className="py-20 sm:py-28 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4 text-kp-orange bg-kp-orange/10 border-0">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-kp-orange/10 text-kp-orange text-sm font-medium mb-4">
             Nasıl Çalışır?
-          </Badge>
+          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-heading)] mb-4">
             <span className="gradient-text">3 adımda</span> dijitalleşin
           </h2>
@@ -55,32 +57,30 @@ export default function HowItWorksSection() {
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Connecting line (desktop) */}
-          <div className="hidden md:block absolute top-20 left-[20%] right-[20%] h-0.5 bg-gradient-to-r from-kp-green via-kp-orange to-kp-coral" />
-
+        {/* Steps - Vertical card layout */}
+        <div className="space-y-6">
           {steps.map((step, index) => (
-            <div key={index} className="relative text-center group">
-              {/* Step number circle */}
-              <div className="relative mx-auto mb-6">
-                <div className={`w-16 h-16 mx-auto rounded-2xl ${step.bgColor} flex items-center justify-center shadow-sm group-hover:shadow-lg transition-all group-hover:scale-110`}>
-                  <FontAwesomeIcon
-                    icon={step.icon}
-                    className={`${step.iconColor} text-2xl`}
-                  />
-                </div>
-                <div className={`absolute -top-2 -right-2 w-7 h-7 rounded-full ${step.badgeBg} text-white text-xs font-bold flex items-center justify-center shadow`}>
-                  {step.number}
-                </div>
+            <div
+              key={index}
+              className={`${step.bgColor} ${step.borderColor} border rounded-2xl p-6 sm:p-8 flex items-start gap-6 hover:shadow-lg transition-all duration-300`}
+            >
+              {/* Step number */}
+              <div className={`${step.numberBg} w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                <span className="text-white text-lg font-bold">{step.number}</span>
               </div>
 
-              <h3 className="text-xl font-bold font-[family-name:var(--font-heading)] mb-3">
-                {step.title}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
-                {step.description}
-              </p>
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2">
+                  <FontAwesomeIcon icon={step.icon} className={`${step.iconColor} text-lg`} />
+                  <h3 className="text-xl font-bold font-[family-name:var(--font-heading)]">
+                    {step.title}
+                  </h3>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-lg">
+                  {step.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>

@@ -197,7 +197,7 @@ export default function LoginPage() {
               ? "Hasta dosyası, aşı takibi, reçete yazma ve randevu yönetimi tek platformda."
               : isPet
               ? "Bakım takvimi, öncesi/sonrası fotoğraf, müşteri portalı ve online randevu."
-              : "Randevu, müşteri, stok ve muhasebe yönetimini tek platformda birleştirin. Veteriner kliniği veya pet kuaför — hepsi burada."}
+              : "Randevu, müşteri, stok ve muhasebe yönetimini tek platformda birleştirin. Veteriner kliniği veya pet kuaför, hepsi burada."}
           </p>
         </div>
       </div>

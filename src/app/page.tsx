@@ -1,5 +1,6 @@
 import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
+import FeatureTour from "@/components/landing/FeatureTour";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import PricingSection from "@/components/landing/PricingSection";
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Navbar />
       <main>
         <HeroSection />
+        <FeatureTour />
         <FeaturesSection />
         <HowItWorksSection />
         <PricingSection />

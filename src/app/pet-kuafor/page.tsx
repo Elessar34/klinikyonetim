@@ -31,7 +31,7 @@ export default function PetKuaforPage() {
       <main className="pt-20">
         <section className="bg-gradient-to-br from-[#F5A623] to-orange-600 text-white py-20">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">✂️ Pet Kuaför Yazılımı</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Pet Kuaför Yazılımı</h1>
             <p className="text-xl text-white/80">Pet bakım işletmenizi profesyonelce yönetin</p>
             <Link href="/kayit" className="inline-block mt-6 bg-white text-[#F5A623] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
               Ücretsiz Deneyin
